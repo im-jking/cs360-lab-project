@@ -1,18 +1,23 @@
 import Header from "../Header";
 import { ListingItem } from "../../utility/interfaces";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import {
+  Box,
+  Button,
   Card,
   CardActionArea,
+  CardActions,
   CardContent,
   CardMedia,
   Grid2,
+  Modal,
   Typography,
 } from "@mui/material";
 import "../../App.css";
 
 export default function Products() {
   const [products, setProducts] = useState<ListingItem[]>([]);
+  const [openProduct, setOpenProduct] = useState<number | null>(null);
 
   //Arbitrary products, can be edited and added to as needed
   //Begin products -----------------------------------------
@@ -63,6 +68,11 @@ export default function Products() {
   }, []);
   //End products -------------------------------------------
 
+  const addCartItem = (product: ListingItem) => {
+    //INCORPORATE BACKEND CART STORAGE
+    console.log("Product added to cart: ", product);
+  };
+
   return (
     <>
       <Header />
@@ -74,7 +84,7 @@ export default function Products() {
       >
         {products.map((product) => (
           <Card sx={{ maxWidth: "40%" }} key={product.id}>
-            <CardActionArea>
+            <CardActionArea onClick={() => setOpenProduct(product.id)}>
               <CardMedia
                 component="img"
                 sx={{ width: "100%", maxHeight: "10em", overflow: "hidden" }}
@@ -97,6 +107,63 @@ export default function Products() {
                 </Typography>
               </CardContent>
             </CardActionArea>
+            <Modal
+              open={openProduct === product.id}
+              onClose={() => setOpenProduct(null)}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "60%",
+                  bgcolor: "background.paper",
+                  border: "2px solid #000",
+                  boxShadow: 24,
+                  p: 4,
+                }}
+              >
+                <Card key={product.id}>
+                  <CardMedia
+                    component="img"
+                    sx={{
+                      width: "100%",
+                      maxHeight: "70vh",
+                      overflow: "hidden",
+                    }}
+                    image={"/src/assets/" + product.imageURL}
+                    title={product.name}
+                  ></CardMedia>
+                  <CardContent>
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="div"
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div>{product.name}</div>
+                      <div style={{ color: "gold" }}>${product.price}</div>
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      {product.description}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button onClick={() => addCartItem(product)}>
+                      Add to Cart
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Box>
+            </Modal>
           </Card>
         ))}
       </Grid2>
