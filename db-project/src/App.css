@@ -1,0 +1,4 @@
+.product-list {
+  display: inline-grid;
+  max-width: 100%;
+}

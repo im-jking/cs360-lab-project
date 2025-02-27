@@ -192,16 +192,25 @@ export default function Header() {
               ))}
               <MenuItem
                 key="Login"
-                onClick={() => {
-                  setLoginOpen(true);
-                  handleCloseUserMenu();
-                }}
+                //Will need to edit the below with database interactions
+                onClick={
+                  isLoggedIn
+                    ? () => setIsLoggedIn(false)
+                    : () => {
+                        setLoginOpen(true);
+                        handleCloseUserMenu();
+                      }
+                }
               >
                 <Typography variant="button" sx={{ textAlign: "center" }}>
                   {isLoggedIn ? <>Logout</> : <>Login</>}
                 </Typography>
               </MenuItem>
-              <Login loginOpen={loginOpen} setLoginOpen={setLoginOpen} />
+              <Login
+                loginOpen={loginOpen}
+                setLoginOpen={setLoginOpen}
+                setIsLoggedIn={setIsLoggedIn}
+              />
             </Menu>
           </Box>
         </Toolbar>

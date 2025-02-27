@@ -6,14 +6,16 @@ import {
   InputLabel,
   Modal,
 } from "@mui/material";
-import React, { ChangeEvent, SetStateAction, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 
 export default function Login({
   loginOpen,
   setLoginOpen,
+  setIsLoggedIn,
 }: {
   loginOpen: boolean;
   setLoginOpen: React.Dispatch<SetStateAction<boolean>>;
+  setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
 }) {
   const [logInfo, setLogInfo] = useState({
     username: "",
@@ -24,7 +26,8 @@ export default function Login({
     e.preventDefault();
     //Check if login info is empty
     if (logInfo.username !== "" && logInfo.password !== "") {
-      //Dispatch action here
+      //Dispatch action here - FILL WITH BACKEND/DATABASE INTERACTIONS
+      setIsLoggedIn(true);
       setLoginOpen(false);
     }
   };
