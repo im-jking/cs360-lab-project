@@ -68,9 +68,17 @@ export default function Products() {
   }, []);
   //End products -------------------------------------------
 
+  //Add items to the cart, stored in browser's local storage
   const addCartItem = (product: ListingItem) => {
-    //INCORPORATE BACKEND CART STORAGE
-    console.log("Product added to cart: ", product);
+    let prevCart = JSON.parse(localStorage.getItem("cart") as string);
+    if (prevCart) {
+      prevCart.push(product);
+    } else {
+      prevCart = [product];
+    }
+    // const newCart = prevCart ? prevCart.push(product) : [product];
+
+    localStorage.setItem("cart", JSON.stringify(prevCart));
   };
 
   return (

@@ -14,6 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { NavLink } from "react-router";
 import Login from "./Login";
+import { ListingItem } from "../utility/interfaces";
 
 const pages = ["Products", "Cart", "About"];
 const settings = ["Profile", "Account"];
@@ -21,6 +22,7 @@ const settings = ["Profile", "Account"];
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = React.useState<boolean>(false);
   const [loginOpen, setLoginOpen] = React.useState<boolean>(false);
+  const [cartItems, setCartItems] = React.useState<ListingItem | null>(null);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
