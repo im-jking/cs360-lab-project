@@ -1,6 +1,6 @@
 import Header from "../Header";
 import { ListingItem } from "../../utility/interfaces";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -84,7 +84,13 @@ export default function Products() {
   return (
     <>
       <Header />
-      <h1>Products</h1>
+      <Typography
+        component="div"
+        variant="h1"
+        sx={{ bgcolor: "#202020", paddingLeft: "2%", marginBottom: "2%" }}
+      >
+        Products
+      </Typography>
       <Grid2
         container
         spacing={{ xs: 2, md: 3 }}
