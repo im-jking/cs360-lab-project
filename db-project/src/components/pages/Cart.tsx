@@ -11,7 +11,6 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import Header from "../Header";
 import { ListingItem } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
@@ -64,7 +63,6 @@ export default function Cart() {
 
   return (
     <>
-      <Header />
       <Typography
         component="div"
         variant="h1"

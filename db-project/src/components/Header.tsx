@@ -14,15 +14,24 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { NavLink } from "react-router";
 import Login from "./Login";
-import { ListingItem } from "../utility/interfaces";
 
 const pages = ["Products", "Cart", "About"];
-const settings = ["Profile", "Account"];
+const settings = ["Account", "Dashboard"];
 
-export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = React.useState<boolean>(false);
+export default function Header({
+  isLoggedIn,
+  setIsLoggedIn,
+  logInfo,
+  setLogInfo,
+}: {
+  isLoggedIn: boolean;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  logInfo: { username: string; password: string };
+  setLogInfo: React.Dispatch<
+    React.SetStateAction<{ username: string; password: string }>
+  >;
+}) {
   const [loginOpen, setLoginOpen] = React.useState<boolean>(false);
-  const [cartItems, setCartItems] = React.useState<ListingItem | null>(null);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -176,22 +185,26 @@ export default function Header() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography variant="button" sx={{ textAlign: "center" }}>
-                    <NavLink
-                      to={"/" + setting}
-                      style={{
-                        textDecoration: "none",
-                        color: "white",
-                        display: "block",
-                      }}
-                    >
-                      {setting}
-                    </NavLink>
-                  </Typography>
-                </MenuItem>
-              ))}
+              {isLoggedIn ? (
+                settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography variant="button" sx={{ textAlign: "center" }}>
+                      <NavLink
+                        to={"/" + setting}
+                        style={{
+                          textDecoration: "none",
+                          color: "white",
+                          display: "block",
+                        }}
+                      >
+                        {setting}
+                      </NavLink>
+                    </Typography>
+                  </MenuItem>
+                ))
+              ) : (
+                <div></div>
+              )}
               <MenuItem
                 key="Login"
                 //Will need to edit the below with database interactions
@@ -212,6 +225,8 @@ export default function Header() {
                 loginOpen={loginOpen}
                 setLoginOpen={setLoginOpen}
                 setIsLoggedIn={setIsLoggedIn}
+                logInfo={logInfo}
+                setLogInfo={setLogInfo}
               />
             </Menu>
           </Box>

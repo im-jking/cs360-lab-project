@@ -6,22 +6,23 @@ import {
   InputLabel,
   Modal,
 } from "@mui/material";
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction } from "react";
 
 export default function Login({
   loginOpen,
+  logInfo,
   setLoginOpen,
   setIsLoggedIn,
+  setLogInfo,
 }: {
   loginOpen: boolean;
   setLoginOpen: React.Dispatch<SetStateAction<boolean>>;
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
+  logInfo: { username: string; password: string };
+  setLogInfo: React.Dispatch<
+    React.SetStateAction<{ username: string; password: string }>
+  >;
 }) {
-  const [logInfo, setLogInfo] = useState({
-    username: "",
-    password: "",
-  });
-
   const handleLoginSubmit = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     //Check if login info is empty
@@ -29,6 +30,12 @@ export default function Login({
       //Dispatch action here - FILL WITH BACKEND/DATABASE INTERACTIONS
       setIsLoggedIn(true);
       setLoginOpen(false);
+      console.log(
+        "Log in as user " +
+          logInfo.username +
+          " with password " +
+          logInfo.password
+      );
     }
   };
 

@@ -1,10 +1,8 @@
 import { Typography } from "@mui/material";
-import Header from "../Header";
 
 export default function About() {
   return (
     <>
-      <Header />
       <Typography
         component="div"
         variant="h1"
