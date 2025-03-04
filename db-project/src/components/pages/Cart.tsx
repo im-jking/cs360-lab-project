@@ -24,7 +24,7 @@ export default function Cart() {
     let price = 0;
     if (cartData) {
       cartData.forEach((item: ListingItem) => {
-        price += item.price;
+        price += Number(item.price);
       });
     }
     setTotalPrice(price);

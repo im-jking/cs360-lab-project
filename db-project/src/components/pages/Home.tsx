@@ -10,7 +10,9 @@ export default function Home() {
       >
         Home Page
       </Typography>
-      <p>Make this a sleek little introduction to the website.</p>
+      <Typography component="div" variant="h5" sx={{ marginLeft: "2%" }}>
+        Here is a sleek overview of the site
+      </Typography>
     </>
   );
 }

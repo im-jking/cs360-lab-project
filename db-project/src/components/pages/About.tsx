@@ -10,9 +10,12 @@ export default function About() {
       >
         About
       </Typography>
-      <p>
-        Talk about the team here, as well as website operations and whatnot.
-      </p>
+      <Typography component="div" variant="h5" sx={{ marginLeft: "2%" }}>
+        Here is a description of the site's functionality.
+      </Typography>
+      <Typography component="div" variant="h5" sx={{ marginLeft: "2%" }}>
+        And here is an introduction to the team!
+      </Typography>
     </>
   );
 }
