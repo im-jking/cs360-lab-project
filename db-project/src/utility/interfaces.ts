@@ -6,3 +6,9 @@ export interface ListingItem {
   id: number; //Unique ID for item
   in_stock: number; //Number of item in stock
 }
+
+export interface OrderRecord {
+  order_id: number;
+  purchaser_email: string;
+  product_id: number[];
+}

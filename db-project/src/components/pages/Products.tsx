@@ -97,7 +97,6 @@ export default function Products() {
     addProduct(obj3);
     addProduct(obj4);
     addProduct(obj5);
-    setProducts([obj1, obj2, obj3, obj4, obj5]);
   }, []);
   //End products -------------------------------------------
 
@@ -105,11 +104,16 @@ export default function Products() {
   const addCartItem = (product: ListingItem) => {
     let prevCart = JSON.parse(localStorage.getItem("cart") as string);
     if (prevCart) {
+      //Ensure item is not already in cart
+      prevCart.forEach((element: ListingItem) => {
+        if (element["id"] == product.id) {
+          return;
+        }
+      });
       prevCart.push(product);
     } else {
       prevCart = [product];
     }
-    // const newCart = prevCart ? prevCart.push(product) : [product];
 
     localStorage.setItem("cart", JSON.stringify(prevCart));
   };

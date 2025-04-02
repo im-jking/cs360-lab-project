@@ -11,7 +11,7 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import { ListingItem } from "../../utility/interfaces";
+import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
 
@@ -33,6 +33,33 @@ export default function Cart() {
   const handlePurchase = () => {
     //Placeholder operation
     console.log("Purchased items: " + cartData + " for " + totalPrice);
+
+    //Set orders in the browser
+    let prevOrds = JSON.parse(localStorage.getItem("orders") as string);
+
+    //REMOVE WHEN AUTOINCS FROM DB
+    const orderID = 1;
+    //CHANGE TO POPULATE WITH EMAIL FROM LOGIN
+    const email = "buyer@example.com";
+
+    const prodID: number[] = [];
+    cartData.forEach((element: ListingItem) => {
+      prodID.push(element["id"]);
+    });
+
+    const newOrd: OrderRecord = {
+      order_id: orderID,
+      purchaser_email: email,
+      product_id: prodID,
+    };
+
+    if (prevOrds) {
+      prevOrds.push(newOrd);
+    } else {
+      prevOrds = [newOrd];
+    }
+
+    localStorage.setItem("orders", JSON.stringify(prevOrds));
     localStorage.removeItem("cart");
     setPurchaseModal(false);
   };
@@ -185,7 +212,7 @@ export default function Cart() {
                     sx={{ display: "flex", flexDirection: "column" }}
                   >
                     <Typography gutterBottom variant="h5" component="div">
-                      <div style={{ display: "flex" }}>{item.name}</div>
+                      <div>{item.name}</div>
                       <div style={{ color: "gold" }}>${item.price}</div>
                     </Typography>
                   </CardContent>
@@ -196,21 +223,9 @@ export default function Cart() {
                 No Items in Cart
               </Typography>
             )}
+            <Typography>Total: ${totalPrice}</Typography>
+            <br />
           </Grid2>
-          <div>
-            {/* Form input div */}
-            <FormControl sx={{ width: "100%", marginBottom: "5%" }}>
-              <InputLabel htmlFor="purchaseInput">
-                Purchase Input Placeholder
-              </InputLabel>
-              <Input
-                id="purchaseInput"
-                name="purchase"
-                placeholder="Placeholder input"
-                // onChange={handleInput}
-              />
-            </FormControl>
-          </div>
           <Button
             disabled={!(cartData && Object.keys(cartData).length)}
             variant="contained"

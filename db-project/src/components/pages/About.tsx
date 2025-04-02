@@ -11,11 +11,13 @@ export default function About() {
         About
       </Typography>
       <Typography component="div" variant="h5" sx={{ marginLeft: "2%" }}>
-        Here is a description of the site's functionality.
+        The Team
       </Typography>
-      <Typography component="div" variant="h5" sx={{ marginLeft: "2%" }}>
-        And here is an introduction to the team!
-      </Typography>
+      <ul>
+        <li>Enoch Myers - Backend</li>
+        <li>Ian King - Frontend</li>
+        <li>Shruti Debnath - Database</li>
+      </ul>
     </>
   );
 }

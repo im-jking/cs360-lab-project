@@ -3,15 +3,22 @@ import {
   FormControl,
   Input,
   InputLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
-import { ListingItem } from "../../utility/interfaces";
+import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { CloudUpload } from "@mui/icons-material";
 
 export default function Dashboard() {
   const [prodFormData, setProdFormData] = useState<ListingItem | null>(null);
+
+  const orderData = JSON.parse(localStorage.getItem("orders") as string);
 
   //Add items to the product, stored in browser's local storage; should use DB eventually
   const addProduct = (product: ListingItem | null) => {
@@ -46,11 +53,11 @@ export default function Dashboard() {
     );
   };
 
+  //Submit a new product; CHANGE FOR DB INTEGRATION
   const handleProductSubmit = () => {
     if (prodFormData) {
       prodFormData["id"] = 1;
       prodFormData["imageURL"] = "bike.jpg";
-      prodFormData["created_datetime"] = new Date().getDate();
       addProduct(prodFormData);
     } else {
       console.error("Product form not filled");
@@ -77,18 +84,35 @@ export default function Dashboard() {
         variant="h1"
         sx={{ bgcolor: "#202020", paddingLeft: "2%", marginBottom: "2%" }}
       >
-        Dashboard
+        Admin Dashboard
       </Typography>
       <div style={{ marginLeft: "2%" }}>
         <Typography component="div" variant="h4">
           Previous Purchases
         </Typography>
-        <Typography component="p">
-          Will be populated with information from database.
-        </Typography>
+        {orderData && Object.keys(orderData).length ? (
+          <Table>
+            <TableHead style={{ fontWeight: "bold" }}>
+              <TableCell>Order ID</TableCell>
+              <TableCell>Purchaser</TableCell>
+              <TableCell>Products</TableCell>
+            </TableHead>
+            <TableBody>
+              {orderData.map((order: OrderRecord) => (
+                <TableRow key={order.order_id}>
+                  <TableCell>{order.order_id}</TableCell>
+                  <TableCell>{order.purchaser_email}</TableCell>
+                  <TableCell>{order.product_id.toString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <Typography component="p">No Orders Found</Typography>
+        )}
         <br />
         <Typography component="div" variant="h4">
-          Add Products - Admins Only
+          Add Products
         </Typography>
         {/* Form for product addition */}
         <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
@@ -138,7 +162,7 @@ export default function Dashboard() {
               Upload files
               <VisuallyHiddenInput
                 type="file"
-                // onChange={(event) => console.log(event.target.files)}
+                onChange={(event) => console.log(event.target.files)}
               />
             </Button>
           </FormControl>
