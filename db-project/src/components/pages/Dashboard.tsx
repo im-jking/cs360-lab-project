@@ -11,35 +11,68 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { CloudUpload } from "@mui/icons-material";
 
+const API_URL = "http://127.0.0.1:8000";
+
 export default function Dashboard() {
   const [prodFormData, setProdFormData] = useState<ListingItem | null>(null);
+  const [products, setProducts] = useState<ListingItem[]>([]);
+  const [orderData, setOrderData] = useState<OrderRecord[]>([]);
 
-  const orderData = JSON.parse(localStorage.getItem("orders") as string);
+  // const orderData = JSON.parse(localStorage.getItem("orders") as string);
 
-  //Add items to the product, stored in browser's local storage; should use DB eventually
-  const addProduct = (product: ListingItem | null) => {
-    let prevProd = JSON.parse(localStorage.getItem("products") as string);
+  useEffect(() => {
+    fetch(`${API_URL}/products`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((response) => setProducts(response))
+      .catch((error) => console.error(`Error retrieving products: ${error}`));
+
+    fetch(`${API_URL}/orders`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((response) => setOrderData(response))
+      .catch((error) => console.error(`Error retrieving orders: ${error}`));
+  }, []);
+
+  //Add items to the DB product table,
+  const addProduct = async (product: ListingItem | null) => {
+    // let prevProd = JSON.parse(localStorage.getItem("products") as string);
     let alreadyExists = false;
 
-    if (prevProd) {
-      prevProd.forEach((element: ListingItem) => {
+    if (products) {
+      products.forEach((element: ListingItem) => {
         if (JSON.stringify(element) === JSON.stringify(product)) {
           alreadyExists = true;
           return;
         }
       });
       if (!alreadyExists) {
-        prevProd.push(product);
+        console.log(JSON.stringify(product));
+        // prevProd.push(product);
+        await fetch(`${API_URL}/products`, {
+          method: "POST",
+          body: JSON.stringify(product),
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
       }
-    } else {
-      prevProd = [product];
     }
 
-    localStorage.setItem("products", JSON.stringify(prevProd));
+    // localStorage.setItem("products", JSON.stringify(prevProd));
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +89,7 @@ export default function Dashboard() {
   //Submit a new product; CHANGE FOR DB INTEGRATION
   const handleProductSubmit = () => {
     if (prodFormData) {
-      prodFormData["id"] = 1;
+      prodFormData["id"] = null;
       prodFormData["imageURL"] = "bike.jpg";
       addProduct(prodFormData);
     } else {
@@ -117,11 +150,11 @@ export default function Dashboard() {
         {/* Form for product addition */}
         <div style={{ display: "flex", flexDirection: "column", width: "30%" }}>
           <FormControl>
-            <InputLabel htmlFor="nameInput">Name</InputLabel>
+            <InputLabel htmlFor="titleInput">Title</InputLabel>
             <Input
-              id="nameInput"
-              name="name"
-              placeholder="Name"
+              id="titleInput"
+              name="title"
+              placeholder="Title"
               onChange={handleInput}
             />
           </FormControl>

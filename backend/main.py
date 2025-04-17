@@ -1,14 +1,29 @@
 #***cs360-lab fastapi***
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import mysql.connector
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+    "https://localhost:5173",
+    "localhost:5173"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
 # Connect to MySQL
 db = mysql.connector.connect(
     host="localhost",
-    user="root",
+    user="labuser",
     password="CS360_Project",
     database="shopdb"
 )
@@ -17,21 +32,21 @@ cursor = db.cursor(dictionary=True)
 
 def add_user(email, password, funds=0, is_admin=False):
     cursor.execute("""
-        INSERT INTO Users (email, password, funds, is_admin)
+        INSERT INTO users (email, password, funds, is_admin)
         VALUES (%s, %s, %s, %s)
     """, (email, password, funds, is_admin))
     db.commit()
 
 def add_product(title, description, price, in_stock):
     cursor.execute("""
-        INSERT INTO Products (title, description, price, in_stock)
+        INSERT INTO products (title, description, price, in_stock)
         VALUES (%s, %s, %s, %s)
     """, (title, description, price, in_stock))
     db.commit()
 
 def place_order(email, product_id):
     cursor.execute("""
-        INSERT INTO Orders (purchaser_email, product_id)
+        INSERT INTO orders (purchaser_email, product_id)
         VALUES (%s, %s)
     """, (email, product_id))
     db.commit()
@@ -59,6 +74,8 @@ class Product(BaseModel):
     description: str
     price: int
     in_stock: int
+    id: int | None
+    imageURL: str
 
 class Order(BaseModel):
     purchaser_email: str

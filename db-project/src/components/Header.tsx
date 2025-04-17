@@ -14,6 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { NavLink } from "react-router";
 import Login from "./Login";
+import Register from "./Register";
 
 const pages = ["Products", "Cart", "About"];
 const settings = ["Account", "Dashboard"];
@@ -23,6 +24,8 @@ export default function Header({
   setIsLoggedIn,
   logInfo,
   setLogInfo,
+  regInfo,
+  setRegInfo,
 }: {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,8 +33,18 @@ export default function Header({
   setLogInfo: React.Dispatch<
     React.SetStateAction<{ username: string; password: string }>
   >;
+  regInfo: { username: string; password: string; confPass: string };
+  setRegInfo: React.Dispatch<
+    React.SetStateAction<{
+      username: string;
+      password: string;
+      confPass: string;
+    }>
+  >;
 }) {
   const [loginOpen, setLoginOpen] = React.useState<boolean>(false);
+
+  const [registerOpen, setRegisterOpen] = React.useState<boolean>(false);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -203,7 +216,11 @@ export default function Header({
                   </MenuItem>
                 ))
               ) : (
-                <div></div>
+                <MenuItem key="Register" onClick={() => setRegisterOpen(true)}>
+                  <Typography variant="button" sx={{ textAlign: "center" }}>
+                    Register
+                  </Typography>
+                </MenuItem>
               )}
               <MenuItem
                 key="Login"
@@ -227,6 +244,13 @@ export default function Header({
                 setIsLoggedIn={setIsLoggedIn}
                 logInfo={logInfo}
                 setLogInfo={setLogInfo}
+              />
+              <Register
+                registerOpen={registerOpen}
+                setRegisterOpen={setRegisterOpen}
+                setIsLoggedIn={setIsLoggedIn}
+                regInfo={regInfo}
+                setRegInfo={setRegInfo}
               />
             </Menu>
           </Box>

@@ -4,16 +4,15 @@ import {
   Card,
   CardContent,
   CardMedia,
-  FormControl,
   Grid2,
-  Input,
-  InputLabel,
   Modal,
   Typography,
 } from "@mui/material";
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
+
+const API_URL = "http://localhost:8000";
 
 export default function Cart() {
   const cartData = JSON.parse(localStorage.getItem("cart") as string);
@@ -30,36 +29,47 @@ export default function Cart() {
     setTotalPrice(price);
   }, [cartData]);
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     //Placeholder operation
     console.log("Purchased items: " + cartData + " for " + totalPrice);
 
     //Set orders in the browser
-    let prevOrds = JSON.parse(localStorage.getItem("orders") as string);
+    // let prevOrds = JSON.parse(localStorage.getItem("orders") as string);
+    // let prevOrds = await fetch(`${API_URL}/orders`)
+    //   .then((response) => response.json())
+    //   .catch((error) =>
+    //     console.error(`Error while retrieving orders: ${error}`)
+    //   );
 
     //REMOVE WHEN AUTOINCS FROM DB
-    const orderID = 1;
+    // const orderID = 1;
+
     //CHANGE TO POPULATE WITH EMAIL FROM LOGIN
     const email = "buyer@example.com";
 
     const prodID: number[] = [];
     cartData.forEach((element: ListingItem) => {
-      prodID.push(element["id"]);
+      prodID.push(element["id"] as number);
     });
 
     const newOrd: OrderRecord = {
-      order_id: orderID,
+      order_id: null,
       purchaser_email: email,
       product_id: prodID,
     };
 
-    if (prevOrds) {
-      prevOrds.push(newOrd);
-    } else {
-      prevOrds = [newOrd];
-    }
+    // if (prevOrds) {
+    //   prevOrds.push(newOrd);
+    // } else {
+    //   prevOrds = [newOrd];
+    // }
 
-    localStorage.setItem("orders", JSON.stringify(prevOrds));
+    // localStorage.setItem("orders", JSON.stringify(prevOrds));
+    //Add new order
+    await fetch(`${API_URL}/orders`, {
+      method: "POST",
+      body: JSON.stringify(newOrd),
+    });
     localStorage.removeItem("cart");
     setPurchaseModal(false);
   };
@@ -121,14 +131,14 @@ export default function Cart() {
                     overflow: "hidden",
                   }}
                   image={"/src/assets/" + item.imageURL}
-                  title={item.name}
+                  title={item.title}
                 ></CardMedia>
                 <CardContent sx={{ display: "flex", flexDirection: "column" }}>
                   <Typography gutterBottom variant="h5" component="div">
                     <div style={{ display: "flex" }}>
-                      {item.name}
+                      {item.title}
                       <Button
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => handleRemove(item.id as number)}
                         sx={{ alignSelf: "flex-start" }}
                       >
                         <DeleteOutline />
@@ -206,13 +216,13 @@ export default function Cart() {
                       overflow: "hidden",
                     }}
                     image={"/src/assets/" + item.imageURL}
-                    title={item.name}
+                    title={item.title}
                   ></CardMedia>
                   <CardContent
                     sx={{ display: "flex", flexDirection: "column" }}
                   >
                     <Typography gutterBottom variant="h5" component="div">
-                      <div>{item.name}</div>
+                      <div>{item.title}</div>
                       <div style={{ color: "gold" }}>${item.price}</div>
                     </Typography>
                   </CardContent>

@@ -23,6 +23,11 @@ export default function App() {
     username: "",
     password: "",
   });
+  const [regInfo, setRegInfo] = useState({
+    username: "",
+    password: "",
+    confPass: "",
+  });
 
   return (
     <>
@@ -35,6 +40,8 @@ export default function App() {
               setIsLoggedIn={setIsLoggedIn}
               logInfo={logInfo}
               setLogInfo={setLogInfo}
+              regInfo={regInfo}
+              setRegInfo={setRegInfo}
             />
             <Routes>
               <Route path="/" element={<Home />} />
