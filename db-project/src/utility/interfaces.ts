@@ -10,5 +10,5 @@ export interface ListingItem {
 export interface OrderRecord {
   order_id: number | null;
   purchaser_email: string;
-  product_id: number[];
+  product_id: number;
 }

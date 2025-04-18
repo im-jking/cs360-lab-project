@@ -55,10 +55,10 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="products" element={<Products />} />
-              <Route path="cart" element={<Cart />} />
+              <Route path="cart" element={<Cart curUser={curUser} />} />
               <Route path="about" element={<About />} />
               <Route path="dashboard" element={<Dashboard />} />
-              <Route path="account" element={<Account />} />
+              <Route path="account" element={<Account curUser={curUser} />} />
               <Route path="logout" element={<Logout />} />
             </Routes>
           </ThemeProvider>

@@ -27,10 +27,10 @@ app.add_middleware(
 # Connect to MySQL
 db = mysql.connector.connect(
     host="localhost",
-    # user="labuser",
-    # password="CS360_Project",
-    user="root",
-    password="360classproj",
+    user="labuser",
+    password="CS360_Project",
+    # user="root",
+    # password="360classproj",
     database="shopdb"
 )
 
@@ -66,8 +66,11 @@ def list_products():
     cursor.execute("SELECT * FROM products")
     return cursor.fetchall()
 
-def list_orders():
-    cursor.execute("SELECT * FROM orders")
+def list_orders(user_email: str | None = None):
+    if user_email is None:
+        cursor.execute("SELECT * FROM orders")
+    else:
+        cursor.execute(f"SELECT * FROM orders WHERE orders.purchaser_email=\"{user_email}\"")
     return cursor.fetchall()
 
 class User(BaseModel):
@@ -85,6 +88,7 @@ class Product(BaseModel):
     imageURL: str | None
 
 class Order(BaseModel):
+    order_id: int | None = None
     purchaser_email: str
     product_id: int
 
@@ -124,6 +128,10 @@ def create_order(order: Order):
 @app.get("/orders")
 def get_orders():
     return list_orders()
+
+@app.get("/orders/{user_email}")
+def get_orders_user(user_email: str):
+    return list_orders(user_email)
 
 @app.post("/one_user")
 def login(user: User):

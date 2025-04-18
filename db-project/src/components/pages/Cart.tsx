@@ -11,13 +11,30 @@ import {
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 const API_URL = "http://localhost:8000";
 
-export default function Cart() {
+export default function Cart({
+  curUser,
+}: {
+  curUser: {
+    email: string;
+    password: string;
+    datetime_created: string;
+    funds: number;
+    is_admin: boolean;
+  } | null;
+}) {
   const cartData = JSON.parse(localStorage.getItem("cart") as string);
   const [totalPrice, setTotalPrice] = useState(0);
   const [purchaseModal, setPurchaseModal] = useState(false);
+
+  const payPalOptions = {
+    clientId: "test",
+    currency: "USD",
+    intent: "capture",
+  };
 
   useEffect(() => {
     let price = 0;
@@ -30,46 +47,27 @@ export default function Cart() {
   }, [cartData]);
 
   const handlePurchase = async () => {
-    //Placeholder operation
-    console.log("Purchased items: " + cartData + " for " + totalPrice);
+    //Add new order(s, since we need to store each item ordered)
+    await Promise.all(
+      cartData.map(async (element: ListingItem) => {
+        const newOrd: OrderRecord = {
+          order_id: null,
+          purchaser_email: curUser ? curUser.email : "guest",
+          product_id: element["id"] as number,
+        };
 
-    //Set orders in the browser
-    // let prevOrds = JSON.parse(localStorage.getItem("orders") as string);
-    // let prevOrds = await fetch(`${API_URL}/orders`)
-    //   .then((response) => response.json())
-    //   .catch((error) =>
-    //     console.error(`Error while retrieving orders: ${error}`)
-    //   );
-
-    //REMOVE WHEN AUTOINCS FROM DB
-    // const orderID = 1;
-
-    //CHANGE TO POPULATE WITH EMAIL FROM LOGIN
-    const email = "buyer@example.com";
-
-    const prodID: number[] = [];
-    cartData.forEach((element: ListingItem) => {
-      prodID.push(element["id"] as number);
-    });
-
-    const newOrd: OrderRecord = {
-      order_id: null,
-      purchaser_email: email,
-      product_id: prodID,
-    };
-
-    // if (prevOrds) {
-    //   prevOrds.push(newOrd);
-    // } else {
-    //   prevOrds = [newOrd];
-    // }
-
-    // localStorage.setItem("orders", JSON.stringify(prevOrds));
-    //Add new order
-    await fetch(`${API_URL}/orders`, {
-      method: "POST",
-      body: JSON.stringify(newOrd),
-    });
+        await fetch(`${API_URL}/orders`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newOrd),
+        })
+          .then((response) => response.json())
+          .then((response) => console.log(response))
+          .catch((error) => console.error(error));
+      })
+    );
     localStorage.removeItem("cart");
     setPurchaseModal(false);
   };
@@ -236,13 +234,19 @@ export default function Cart() {
             <Typography>Total: ${totalPrice}</Typography>
             <br />
           </Grid2>
-          <Button
-            disabled={!(cartData && Object.keys(cartData).length)}
-            variant="contained"
-            onClick={handlePurchase}
-          >
-            Confirm Purchase
-          </Button>
+          <PayPalScriptProvider options={payPalOptions}>
+            <Button
+              disabled={
+                !(cartData && Object.keys(cartData).length && curUser !== null)
+              }
+              variant="contained"
+              onClick={handlePurchase}
+              sx={{ marginBottom: "1em" }}
+            >
+              Confirm Purchase
+            </Button>
+            <PayPalButtons />
+          </PayPalScriptProvider>
         </Box>
       </Modal>
     </>

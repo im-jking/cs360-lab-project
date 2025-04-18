@@ -246,7 +246,10 @@ export default function Header({
                 //Will need to edit the below with database interactions
                 onClick={
                   isLoggedIn
-                    ? () => setIsLoggedIn(false)
+                    ? () => {
+                        setIsLoggedIn(false);
+                        setCurUser(null);
+                      }
                     : () => {
                         setLoginOpen(true);
                         handleCloseUserMenu();

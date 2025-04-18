@@ -151,14 +151,16 @@ export default function Dashboard() {
       </Typography>
       <div style={{ marginLeft: "2%" }}>
         <Typography component="div" variant="h4">
-          Previous Purchases
+          All Orders
         </Typography>
         {orderData && Object.keys(orderData).length ? (
           <Table>
             <TableHead style={{ fontWeight: "bold" }}>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Purchaser</TableCell>
-              <TableCell>Products</TableCell>
+              <TableRow>
+                <TableCell>Order ID</TableCell>
+                <TableCell>Purchaser</TableCell>
+                <TableCell>Products</TableCell>
+              </TableRow>
             </TableHead>
             <TableBody>
               {orderData.map((order: OrderRecord) => (
