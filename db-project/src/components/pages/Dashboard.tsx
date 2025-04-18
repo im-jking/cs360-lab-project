@@ -14,6 +14,7 @@ import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { CloudUpload } from "@mui/icons-material";
+import { API_WITH_PORT } from "../../utility/environment";
 
 const API_URL = "http://127.0.0.1:8000";
 
@@ -22,10 +23,8 @@ export default function Dashboard() {
   const [products, setProducts] = useState<ListingItem[]>([]);
   const [orderData, setOrderData] = useState<OrderRecord[]>([]);
 
-  // const orderData = JSON.parse(localStorage.getItem("orders") as string);
-
-  useEffect(() => {
-    fetch(`${API_URL}/products`, {
+  const fillInfo = async () => {
+    await fetch(`${API_URL}/products`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -35,7 +34,7 @@ export default function Dashboard() {
       .then((response) => setProducts(response))
       .catch((error) => console.error(`Error retrieving products: ${error}`));
 
-    fetch(`${API_URL}/orders`, {
+    await fetch(`${API_URL}/orders`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -44,6 +43,10 @@ export default function Dashboard() {
       .then((response) => response.json())
       .then((response) => setOrderData(response))
       .catch((error) => console.error(`Error retrieving orders: ${error}`));
+  };
+
+  useEffect(() => {
+    fillInfo();
   }, []);
 
   //Add items to the DB product table,
@@ -71,6 +74,7 @@ export default function Dashboard() {
         })
           .then((response) => response.json())
           .then((response) => console.log(response))
+          .then(() => setProdFormData(null))
           .catch((error) => console.error(error));
       }
     }
@@ -89,11 +93,13 @@ export default function Dashboard() {
     );
   };
 
-  //Submit a new product; CHANGE FOR DB INTEGRATION
+  //Submit a new product
   const handleProductSubmit = () => {
     if (prodFormData) {
       prodFormData["id"] = null;
-      prodFormData["imageURL"] = "bike.jpg";
+      prodFormData["imageURL"] = prodFormData["imageURL"]
+        ? prodFormData["imageURL"]
+        : "default.jpg";
       addProduct(prodFormData);
     } else {
       console.error("Product form not filled");
@@ -112,6 +118,27 @@ export default function Dashboard() {
     whiteSpace: "nowrap",
     width: 1,
   });
+
+  //Function for file upload
+  const addImage = async (file: File | null) => {
+    if (file === null) {
+      return;
+    }
+    //Add the imageURL to the data
+    setProdFormData(
+      (prev) => ({ ...prev, imageURL: file.name } as ListingItem)
+    );
+    //Create the file in the project folder
+    const formData = new FormData();
+    formData.append("file", file);
+    await fetch(`${API_WITH_PORT}/add_image`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((response) => console.log(response))
+      .catch((error) => console.error(error));
+  };
 
   return (
     <>
@@ -198,7 +225,9 @@ export default function Dashboard() {
               Upload files
               <VisuallyHiddenInput
                 type="file"
-                onChange={(event) => console.log(event.target.files)}
+                onChange={(event) =>
+                  addImage(event.target.files ? event.target.files[0] : null)
+                }
               />
             </Button>
           </FormControl>

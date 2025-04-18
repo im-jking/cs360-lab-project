@@ -1,15 +1,19 @@
 #***cs360-lab fastapi***
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import mysql.connector
+import os
+import shutil
 
 app = FastAPI()
 
 origins = [
     "http://localhost:5173",
     "https://localhost:5173",
-    "localhost:5173"
+    "http://127.0.0.1:5173", 
+    "https://127.0.0.1:5173"
 ]
 
 app.add_middleware(
@@ -23,8 +27,10 @@ app.add_middleware(
 # Connect to MySQL
 db = mysql.connector.connect(
     host="localhost",
-    user="labuser",
-    password="CS360_Project",
+    # user="labuser",
+    # password="CS360_Project",
+    user="root",
+    password="360classproj",
     database="shopdb"
 )
 
@@ -41,7 +47,7 @@ def add_product(product):
 
     cursor.execute("""
         INSERT INTO products (title, description, price, in_stock, imageURL)
-        VALUES (%s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
     """, (product.title, product.description, product.price, product.in_stock, product.imageURL))
     db.commit()
 
@@ -127,3 +133,32 @@ def login(user: User):
         return result
     else:
         return None
+
+UPLOAD_DIR = "uploaded_images"  # Directory to save uploaded files
+os.makedirs(UPLOAD_DIR, exist_ok=True)  # Create the directory if it doesn't exist
+
+@app.post("/add_image")
+def add_image(file: UploadFile = File(...)):
+    try:
+        # Define the file path where the file will be saved
+        file_path = os.path.join(UPLOAD_DIR, file.filename)
+
+        # Save the file to the specified directory
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        return {"message": "File uploaded successfully", "file_path": file_path}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+    
+@app.get("/get_image/{image}")
+def get_image(image: str):
+    try:
+        file_path = os.path.join(UPLOAD_DIR, image)
+
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="File not found")
+        
+        return FileResponse(file_path)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving file: {str(e)}")

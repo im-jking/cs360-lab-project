@@ -67,18 +67,29 @@ export default function Products() {
   // };
 
   const populateData = async () => {
-    await fetch(`${API_WITH_PORT}/products`, {
+    const prods: ListingItem[] = await fetch(`${API_WITH_PORT}/products`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
     })
       .then((response) => response.json())
-      .then((response) => {
-        console.log(response);
-        setProducts(response);
-      })
       .catch((error) => console.error(`Error retrieving products: ${error}`));
+
+    const updatedProds = await Promise.all(
+      prods.map(async (element) => {
+        await fetch(`${API_WITH_PORT}/get_image/${element.imageURL}`)
+          .then((res) => res.blob())
+          .then(
+            (this_image) => (element.imageURL = URL.createObjectURL(this_image))
+          )
+          .catch((error) => console.error(error));
+
+        return element as ListingItem;
+      })
+    );
+
+    setProducts(updatedProds);
   };
 
   // const productData = JSON.parse(localStorage.getItem("products") as string);
@@ -118,15 +129,14 @@ export default function Products() {
         spacing={{ xs: 2, md: 3 }}
         sx={{ justifyContent: "center" }}
       >
-        {products && Object.keys(products).length ? (
-          // products.map((product) => (
+        {products !== null && Object.keys(products).length > 0 ? (
           products.map((product: ListingItem) => (
-            <Card sx={{ maxWidth: "40%" }} key={product.id}>
+            <Card sx={{ width: "30%" }} key={product.id}>
               <CardActionArea onClick={() => setOpenProduct(product.id)}>
                 <CardMedia
                   component="img"
                   sx={{ width: "100%", maxHeight: "10em", overflow: "hidden" }}
-                  image={"/src/assets/" + product.imageURL}
+                  image={product.imageURL}
                   title={product.title}
                 ></CardMedia>
                 <CardContent>
@@ -170,7 +180,7 @@ export default function Products() {
                         maxHeight: "70vh",
                         overflow: "hidden",
                       }}
-                      image={"/src/assets/" + product.imageURL}
+                      image={product.imageURL}
                       title={product.title}
                     ></CardMedia>
                     <CardContent>

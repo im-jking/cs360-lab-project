@@ -130,7 +130,7 @@ export default function Cart() {
                     maxHeight: "10em",
                     overflow: "hidden",
                   }}
-                  image={"/src/assets/" + item.imageURL}
+                  image={item.imageURL}
                   title={item.title}
                 ></CardMedia>
                 <CardContent sx={{ display: "flex", flexDirection: "column" }}>
@@ -215,7 +215,7 @@ export default function Cart() {
                       maxHeight: "10em",
                       overflow: "hidden",
                     }}
-                    image={"/src/assets/" + item.imageURL}
+                    image={item.imageURL}
                     title={item.title}
                   ></CardMedia>
                   <CardContent
