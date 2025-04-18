@@ -28,6 +28,13 @@ export default function App() {
     password: "",
     confPass: "",
   });
+  const [curUser, setCurUser] = useState<{
+    email: string;
+    password: string;
+    datetime_created: string;
+    funds: number;
+    is_admin: boolean;
+  } | null>(null);
 
   return (
     <>
@@ -42,6 +49,8 @@ export default function App() {
               setLogInfo={setLogInfo}
               regInfo={regInfo}
               setRegInfo={setRegInfo}
+              setCurUser={setCurUser}
+              curUser={curUser}
             />
             <Routes>
               <Route path="/" element={<Home />} />

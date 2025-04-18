@@ -68,7 +68,10 @@ export default function Dashboard() {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-        });
+        })
+          .then((response) => response.json())
+          .then((response) => console.log(response))
+          .catch((error) => console.error(error));
       }
     }
 
@@ -171,7 +174,7 @@ export default function Dashboard() {
             <InputLabel htmlFor="inStockInput">Number in Stock</InputLabel>
             <Input
               id="inStockInput"
-              name="inStock"
+              name="in_stock"
               placeholder="Number in Stock"
               onChange={handleInput}
             />

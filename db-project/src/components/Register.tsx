@@ -12,13 +12,11 @@ import { API_WITH_PORT } from "../utility/environment";
 export default function Register({
   registerOpen,
   setRegisterOpen,
-  setIsLoggedIn,
   regInfo,
   setRegInfo,
 }: {
   registerOpen: boolean;
   setRegisterOpen: React.Dispatch<SetStateAction<boolean>>;
-  setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
   regInfo: { username: string; password: string; confPass: string };
   setRegInfo: React.Dispatch<
     SetStateAction<{ username: string; password: string; confPass: string }>
@@ -48,7 +46,7 @@ export default function Register({
         .then((response) => {
           console.log(response);
           if (response["message"] == "User created") {
-            setIsLoggedIn(true);
+            // setIsLoggedIn(true);
             setRegisterOpen(false);
           }
         })

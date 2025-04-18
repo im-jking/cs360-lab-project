@@ -37,11 +37,12 @@ def add_user(email, password, funds=0, is_admin=False):
     """, (email, password, funds, is_admin))
     db.commit()
 
-def add_product(title, description, price, in_stock):
+def add_product(product):
+
     cursor.execute("""
-        INSERT INTO products (title, description, price, in_stock)
+        INSERT INTO products (title, description, price, in_stock, imageURL)
         VALUES (%s, %s, %s, %s)
-    """, (title, description, price, in_stock))
+    """, (product.title, product.description, product.price, product.in_stock, product.imageURL))
     db.commit()
 
 def place_order(email, product_id):
@@ -52,15 +53,15 @@ def place_order(email, product_id):
     db.commit()
 
 def list_users():
-    cursor.execute("SELECT * FROM Users")
+    cursor.execute("SELECT * FROM users")
     return cursor.fetchall()
 
 def list_products():
-    cursor.execute("SELECT * FROM Products")
+    cursor.execute("SELECT * FROM products")
     return cursor.fetchall()
 
 def list_orders():
-    cursor.execute("SELECT * FROM Orders")
+    cursor.execute("SELECT * FROM orders")
     return cursor.fetchall()
 
 class User(BaseModel):
@@ -75,7 +76,7 @@ class Product(BaseModel):
     price: int
     in_stock: int
     id: int | None
-    imageURL: str
+    imageURL: str | None
 
 class Order(BaseModel):
     purchaser_email: str
@@ -97,7 +98,7 @@ def get_users():
 @app.post("/products")
 def create_product(product: Product):
     try:
-        add_product(product.title, product.description, product.price, product.in_stock)
+        add_product(product)
         return {"message": "Product created"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -117,3 +118,12 @@ def create_order(order: Order):
 @app.get("/orders")
 def get_orders():
     return list_orders()
+
+@app.post("/one_user")
+def login(user: User):
+    cursor.execute("SELECT * FROM users WHERE users.email=%s AND users.password=%s", (user.email, user.password))
+    result = cursor.fetchall()
+    if len(result) == 1:
+        return result
+    else:
+        return None

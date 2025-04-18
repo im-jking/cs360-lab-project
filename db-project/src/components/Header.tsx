@@ -17,7 +17,6 @@ import Login from "./Login";
 import Register from "./Register";
 
 const pages = ["Products", "Cart", "About"];
-const settings = ["Account", "Dashboard"];
 
 export default function Header({
   isLoggedIn,
@@ -26,6 +25,8 @@ export default function Header({
   setLogInfo,
   regInfo,
   setRegInfo,
+  setCurUser,
+  curUser,
 }: {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,7 +42,25 @@ export default function Header({
       confPass: string;
     }>
   >;
+  setCurUser: React.Dispatch<
+    React.SetStateAction<{
+      email: string;
+      password: string;
+      datetime_created: string;
+      funds: number;
+      is_admin: boolean;
+    } | null>
+  >;
+  curUser: {
+    email: string;
+    password: string;
+    datetime_created: string;
+    funds: number;
+    is_admin: boolean;
+  } | null;
 }) {
+  const settings = curUser?.is_admin ? ["Account", "Dashboard"] : ["Account"];
+
   const [loginOpen, setLoginOpen] = React.useState<boolean>(false);
 
   const [registerOpen, setRegisterOpen] = React.useState<boolean>(false);
@@ -244,11 +263,11 @@ export default function Header({
                 setIsLoggedIn={setIsLoggedIn}
                 logInfo={logInfo}
                 setLogInfo={setLogInfo}
+                setCurUser={setCurUser}
               />
               <Register
                 registerOpen={registerOpen}
                 setRegisterOpen={setRegisterOpen}
-                setIsLoggedIn={setIsLoggedIn}
                 regInfo={regInfo}
                 setRegInfo={setRegInfo}
               />
