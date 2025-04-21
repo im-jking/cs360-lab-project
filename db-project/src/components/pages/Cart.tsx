@@ -47,6 +47,8 @@ export default function Cart({
   }, [cartData]);
 
   const handlePurchase = async () => {
+    console.log(cartData);
+
     //Add new order(s, since we need to store each item ordered)
     await Promise.all(
       cartData.map(async (element: ListingItem) => {
@@ -55,6 +57,8 @@ export default function Cart({
           purchaser_email: curUser ? curUser.email : "guest",
           product_id: element["id"] as number,
         };
+
+        console.log(newOrd);
 
         await fetch(`${API_URL}/orders`, {
           method: "POST",
@@ -234,19 +238,19 @@ export default function Cart({
             <Typography>Total: ${totalPrice}</Typography>
             <br />
           </Grid2>
-          <PayPalScriptProvider options={payPalOptions}>
-            <Button
-              disabled={
-                !(cartData && Object.keys(cartData).length && curUser !== null)
-              }
-              variant="contained"
-              onClick={handlePurchase}
-              sx={{ marginBottom: "1em" }}
-            >
-              Confirm Purchase
-            </Button>
-            <PayPalButtons />
-          </PayPalScriptProvider>
+          {/* <PayPalScriptProvider options={payPalOptions}> */}
+          <Button
+            disabled={
+              !(cartData && Object.keys(cartData).length && curUser !== null)
+            }
+            variant="contained"
+            onClick={handlePurchase}
+            sx={{ marginBottom: "1em" }}
+          >
+            Confirm Purchase
+          </Button>
+          {/* <PayPalButtons />
+          </PayPalScriptProvider> */}
         </Box>
       </Modal>
     </>
