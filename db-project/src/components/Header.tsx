@@ -14,15 +14,19 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { NavLink } from "react-router";
 import Login from "./Login";
+import Register from "./Register";
 
 const pages = ["Products", "Cart", "About"];
-const settings = ["Account", "Dashboard"];
 
 export default function Header({
   isLoggedIn,
   setIsLoggedIn,
   logInfo,
   setLogInfo,
+  regInfo,
+  setRegInfo,
+  setCurUser,
+  curUser,
 }: {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,8 +34,36 @@ export default function Header({
   setLogInfo: React.Dispatch<
     React.SetStateAction<{ username: string; password: string }>
   >;
+  regInfo: { username: string; password: string; confPass: string };
+  setRegInfo: React.Dispatch<
+    React.SetStateAction<{
+      username: string;
+      password: string;
+      confPass: string;
+    }>
+  >;
+  setCurUser: React.Dispatch<
+    React.SetStateAction<{
+      email: string;
+      password: string;
+      datetime_created: string;
+      funds: number;
+      is_admin: boolean;
+    } | null>
+  >;
+  curUser: {
+    email: string;
+    password: string;
+    datetime_created: string;
+    funds: number;
+    is_admin: boolean;
+  } | null;
 }) {
+  const settings = curUser?.is_admin ? ["Account", "Dashboard"] : ["Account"];
+
   const [loginOpen, setLoginOpen] = React.useState<boolean>(false);
+
+  const [registerOpen, setRegisterOpen] = React.useState<boolean>(false);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -203,14 +235,21 @@ export default function Header({
                   </MenuItem>
                 ))
               ) : (
-                <div></div>
+                <MenuItem key="Register" onClick={() => setRegisterOpen(true)}>
+                  <Typography variant="button" sx={{ textAlign: "center" }}>
+                    Register
+                  </Typography>
+                </MenuItem>
               )}
               <MenuItem
                 key="Login"
                 //Will need to edit the below with database interactions
                 onClick={
                   isLoggedIn
-                    ? () => setIsLoggedIn(false)
+                    ? () => {
+                        setIsLoggedIn(false);
+                        setCurUser(null);
+                      }
                     : () => {
                         setLoginOpen(true);
                         handleCloseUserMenu();
@@ -227,6 +266,13 @@ export default function Header({
                 setIsLoggedIn={setIsLoggedIn}
                 logInfo={logInfo}
                 setLogInfo={setLogInfo}
+                setCurUser={setCurUser}
+              />
+              <Register
+                registerOpen={registerOpen}
+                setRegisterOpen={setRegisterOpen}
+                regInfo={regInfo}
+                setRegInfo={setRegInfo}
               />
             </Menu>
           </Box>

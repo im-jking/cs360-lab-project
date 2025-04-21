@@ -7,6 +7,7 @@ import {
   Modal,
 } from "@mui/material";
 import React, { SetStateAction } from "react";
+import { API_WITH_PORT } from "../utility/environment";
 
 export default function Login({
   loginOpen,
@@ -14,6 +15,7 @@ export default function Login({
   setLoginOpen,
   setIsLoggedIn,
   setLogInfo,
+  setCurUser,
 }: {
   loginOpen: boolean;
   setLoginOpen: React.Dispatch<SetStateAction<boolean>>;
@@ -22,20 +24,48 @@ export default function Login({
   setLogInfo: React.Dispatch<
     React.SetStateAction<{ username: string; password: string }>
   >;
+  setCurUser: React.Dispatch<
+    React.SetStateAction<{
+      email: string;
+      password: string;
+      datetime_created: string;
+      funds: number;
+      is_admin: boolean;
+    } | null>
+  >;
 }) {
-  const handleLoginSubmit = (e: React.MouseEvent<HTMLElement>) => {
+  const handleLoginSubmit = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     //Check if login info is empty
     if (logInfo.username !== "" && logInfo.password !== "") {
-      //Dispatch action here - FILL WITH BACKEND/DATABASE INTERACTIONS
-      setIsLoggedIn(true);
-      setLoginOpen(false);
-      console.log(
-        "Log in as user " +
-          logInfo.username +
-          " with password " +
-          logInfo.password
-      );
+      await fetch(`${API_WITH_PORT}/one_user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          email: logInfo.username,
+          password: logInfo.password,
+        }),
+      })
+        .then((response) => response.json())
+        .then((response) => {
+          setIsLoggedIn(Object.keys(response).length > 0);
+          setLoginOpen(Object.keys(response).length <= 0);
+          console.log(response);
+          if (Object.keys(response).length > 0) {
+            console.log(
+              "Log in as user " +
+                response[0]["email"] +
+                " with password " +
+                response[0]["password"]
+            );
+            setCurUser(response[0]);
+          } else {
+            console.log("Login failed: user does not exist.");
+          }
+        });
     }
   };
 

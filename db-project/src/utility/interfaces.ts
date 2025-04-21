@@ -1,8 +1,15 @@
 export interface ListingItem {
-  name: string; //Name of the item
+  title: string; //Name of the item
   price: number; //Price of the item
   imageURL: string; //Filename of item image
   description: string; //String description of item
-  id: number; //Unique ID for item
+  id: number | null; //Unique ID for item
   in_stock: number; //Number of item in stock
+  category: string; //Category of the item for filtering
+}
+
+export interface OrderRecord {
+  order_id: number | null;
+  purchaser_email: string;
+  product_id: number;
 }

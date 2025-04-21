@@ -23,6 +23,18 @@ export default function App() {
     username: "",
     password: "",
   });
+  const [regInfo, setRegInfo] = useState({
+    username: "",
+    password: "",
+    confPass: "",
+  });
+  const [curUser, setCurUser] = useState<{
+    email: string;
+    password: string;
+    datetime_created: string;
+    funds: number;
+    is_admin: boolean;
+  } | null>(null);
 
   return (
     <>
@@ -35,14 +47,18 @@ export default function App() {
               setIsLoggedIn={setIsLoggedIn}
               logInfo={logInfo}
               setLogInfo={setLogInfo}
+              regInfo={regInfo}
+              setRegInfo={setRegInfo}
+              setCurUser={setCurUser}
+              curUser={curUser}
             />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="products" element={<Products />} />
-              <Route path="cart" element={<Cart />} />
+              <Route path="cart" element={<Cart curUser={curUser} />} />
               <Route path="about" element={<About />} />
               <Route path="dashboard" element={<Dashboard />} />
-              <Route path="account" element={<Account />} />
+              <Route path="account" element={<Account curUser={curUser} />} />
               <Route path="logout" element={<Logout />} />
             </Routes>
           </ThemeProvider>

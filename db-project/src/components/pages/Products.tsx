@@ -9,109 +9,98 @@ import {
   CardContent,
   CardMedia,
   Grid2,
+  MenuItem,
   Modal,
+  TextField,
   Typography,
 } from "@mui/material";
 import "../../App.css";
+import { API_WITH_PORT, filterCats } from "../../utility/environment";
 
 export default function Products() {
   const [products, setProducts] = useState<ListingItem[] | null>(null);
   const [openProduct, setOpenProduct] = useState<number | null>(null);
+  const [search, setSearch] = useState<ListingItem[] | null>(null);
 
-  const productData = JSON.parse(localStorage.getItem("products") as string);
+  const populateData = async () => {
+    const prods: ListingItem[] = await fetch(`${API_WITH_PORT}/products`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(`Error retrieving products: ${error}`));
 
-  //Arbitrary products, can be edited and added to as needed
-  //Begin products -----------------------------------------
+    const updatedProds = await Promise.all(
+      prods.map(async (element) => {
+        await fetch(`${API_WITH_PORT}/get_image/${element.imageURL}`)
+          .then((res) => res.blob())
+          .then(
+            (this_image) => (element.imageURL = URL.createObjectURL(this_image))
+          )
+          .catch((error) => console.error(error));
 
-  //Add items to the product, stored in browser's local storage; should use DB eventually
-  const addProduct = (product: ListingItem | null) => {
-    let prevProd = JSON.parse(localStorage.getItem("products") as string);
-    let alreadyExists = false;
+        return element as ListingItem;
+      })
+    );
 
-    if (prevProd) {
-      prevProd.forEach((element: ListingItem) => {
-        if (JSON.stringify(element) === JSON.stringify(product)) {
-          alreadyExists = true;
-          return;
-        }
-      });
-      if (!alreadyExists) {
-        prevProd.push(product);
-      }
-    } else {
-      prevProd = [product];
-    }
-
-    localStorage.setItem("products", JSON.stringify(prevProd));
+    setProducts(updatedProds);
+    return updatedProds;
   };
 
-  const obj1: ListingItem = {
-    name: "Bicycle",
-    price: 120,
-    imageURL: "bike.jpg",
-    description:
-      "A bicycle, also called a pedal cycle, bike, push-bike or cycle, is a human-powered or motor-assisted, pedal-driven, single-track vehicle, with two wheels attached to a frame, one behind the other. A bicycle rider is called a cyclist, or bicyclist.",
-    id: 0,
-    in_stock: 100,
-  };
-  const obj2: ListingItem = {
-    name: "Ford F150",
-    price: 84000,
-    imageURL: "truck.jpg",
-    description:
-      "The Ford F-Series is a series of light-duty trucks marketed and manufactured by Ford Motor Company since the 1948 model year.",
-    id: 1,
-    in_stock: 100,
-  };
-  const obj3: ListingItem = {
-    name: "Pogo Stick",
-    price: 18,
-    imageURL: "pogo.jpg",
-    description:
-      "A pogo stick is a vehicle for jumping off the ground in a standing position—through the aid of a spring, or new high performance technologies—often used as a toy, exercise equipment or extreme sports instrument.",
-    id: 2,
-    in_stock: 100,
-  };
-  const obj4: ListingItem = {
-    name: "Shoe",
-    price: 55,
-    imageURL: "shoe.jpg",
-    description:
-      "A shoe is an item of footwear intended to protect and comfort the human foot. Though the human foot can adapt to varied terrains and climate conditions, it is vulnerable, and shoes provide protection.",
-    id: 3,
-    in_stock: 100,
-  };
-  const obj5: ListingItem = {
-    name: "Jet",
-    price: 300000000,
-    imageURL: "jet.jpg",
-    description:
-      "A business jet, private jet, or bizjet is a jet aircraft designed for transporting small groups of people, typically business executives and high-ranking associates. Business jets are generally designed for faster air travel and more personal comfort than commercial aircraft, and may be adapted for other roles, such as casualty evacuation or express parcel deliveries, and some are used by public bodies, government officials, VIPs, or even the military.",
-    id: 4,
-    in_stock: 100,
-  };
-
+  // const productData = JSON.parse(localStorage.getItem("products") as string);
   useEffect(() => {
-    addProduct(obj1);
-    addProduct(obj2);
-    addProduct(obj3);
-    addProduct(obj4);
-    addProduct(obj5);
-    setProducts([obj1, obj2, obj3, obj4, obj5]);
+    populateData();
   }, []);
-  //End products -------------------------------------------
 
   //Add items to the cart, stored in browser's local storage
   const addCartItem = (product: ListingItem) => {
     let prevCart = JSON.parse(localStorage.getItem("cart") as string);
     if (prevCart) {
+      //Ensure item is not already in cart
+      prevCart.forEach((element: ListingItem) => {
+        if (element["id"] == product.id) {
+          return;
+        }
+      });
       prevCart.push(product);
     } else {
       prevCart = [product];
     }
-    // const newCart = prevCart ? prevCart.push(product) : [product];
 
     localStorage.setItem("cart", JSON.stringify(prevCart));
+  };
+
+  //Filter searched items
+  const handleSearch = (searchTerm: string) => {
+    if (searchTerm == "") {
+      setSearch(null);
+    } else {
+      const newSearch: ListingItem[] = [];
+      products?.forEach((product) => {
+        if (product.title.includes(searchTerm)) {
+          newSearch.push(product);
+          // setSearch((prev) => ({ ...prev, product } as ListingItem[]));
+        }
+      });
+      setSearch(newSearch);
+    }
+  };
+
+  //Filter by category
+  const handleCat = async (searchCat: string) => {
+    const curProds = await populateData();
+
+    if (searchCat !== "all") {
+      const filteredProds: ListingItem[] = [];
+      curProds?.forEach((product) => {
+        if (product.category === searchCat) {
+          filteredProds.push(product);
+        }
+      });
+      setProducts(filteredProds);
+    }
   };
 
   return (
@@ -123,103 +112,239 @@ export default function Products() {
       >
         Products
       </Typography>
-      <Grid2
-        container
-        spacing={{ xs: 2, md: 3 }}
-        sx={{ justifyContent: "center" }}
+      <TextField
+        id="search-field"
+        label="Search"
+        type="search"
+        variant="filled"
+        sx={{ marginBottom: "1.5em", marginLeft: "3em" }}
+        onBlur={(e) => handleSearch(e.target.value)}
+      />
+      <TextField
+        id="select-category"
+        select
+        label="Filter"
+        defaultValue="all"
+        helperText="Please select a filter category"
+        variant="filled"
+        sx={{ marginLeft: "1.5em" }}
+        onBlur={(e) => handleCat(e.target.value)}
       >
-        {productData && Object.keys(productData).length ? (
-          // products.map((product) => (
-          productData.map((product: ListingItem) => (
-            <Card sx={{ maxWidth: "40%" }} key={product.id}>
-              <CardActionArea onClick={() => setOpenProduct(product.id)}>
-                <CardMedia
-                  component="img"
-                  sx={{ width: "100%", maxHeight: "10em", overflow: "hidden" }}
-                  image={"/src/assets/" + product.imageURL}
-                  title={product.name}
-                ></CardMedia>
-                <CardContent>
-                  <Typography
-                    gutterBottom
-                    variant="h5"
-                    component="div"
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <div>{product.name}</div>
-                    <div style={{ color: "gold" }}>${product.price}</div>
-                  </Typography>
+        {filterCats.map((option) => (
+          <MenuItem key={option.base_str} value={option.base_str}>
+            {option.value}
+          </MenuItem>
+        ))}
+      </TextField>
+      {search === null ? (
+        <Grid2
+          container
+          spacing={{ xs: 2, md: 3 }}
+          sx={{ justifyContent: "center" }}
+        >
+          {products !== null && Object.keys(products).length > 0 ? (
+            products.map((product: ListingItem) => (
+              <Card sx={{ width: "30%" }} key={product.id}>
+                <CardActionArea onClick={() => setOpenProduct(product.id)}>
+                  <CardMedia
+                    component="img"
+                    sx={{
+                      width: "100%",
+                      maxHeight: "10em",
+                      overflow: "hidden",
+                    }}
+                    image={product.imageURL}
+                    title={product.title}
+                  ></CardMedia>
+                  <CardContent>
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="div"
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <div>{product.title}</div>
+                      <div style={{ color: "gold" }}>${product.price}</div>
+                    </Typography>
 
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    {product.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-              <Modal
-                open={openProduct === product.id}
-                onClose={() => setOpenProduct(null)}
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "60%",
-                    bgcolor: "background.paper",
-                    border: "2px solid #000",
-                    boxShadow: 24,
-                    p: 4,
-                  }}
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      {product.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+                <Modal
+                  open={openProduct === product.id}
+                  onClose={() => setOpenProduct(null)}
                 >
-                  <Card key={product.id}>
-                    <CardMedia
-                      component="img"
-                      sx={{
-                        width: "100%",
-                        maxHeight: "70vh",
-                        overflow: "hidden",
-                      }}
-                      image={"/src/assets/" + product.imageURL}
-                      title={product.name}
-                    ></CardMedia>
-                    <CardContent>
-                      <Typography
-                        gutterBottom
-                        variant="h5"
-                        component="div"
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "60%",
+                      bgcolor: "background.paper",
+                      border: "2px solid #000",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <Card key={product.id}>
+                      <CardMedia
+                        component="img"
                         sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
+                          width: "100%",
+                          maxHeight: "70vh",
+                          overflow: "hidden",
                         }}
-                      >
-                        <div>{product.name}</div>
-                        <div style={{ color: "gold" }}>${product.price}</div>
-                      </Typography>
+                        image={product.imageURL}
+                        title={product.title}
+                      ></CardMedia>
+                      <CardContent>
+                        <Typography
+                          gutterBottom
+                          variant="h5"
+                          component="div"
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <div>{product.title}</div>
+                          <div style={{ color: "gold" }}>${product.price}</div>
+                        </Typography>
 
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "text.secondary" }}
-                      >
-                        {product.description}
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button onClick={() => addCartItem(product)}>
-                        Add to Cart
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Box>
-              </Modal>
-            </Card>
-          ))
-        ) : (
-          <Typography component="div" variant="h5">
-            No Products Found
-          </Typography>
-        )}
-      </Grid2>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "text.secondary" }}
+                        >
+                          {product.description}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button onClick={() => addCartItem(product)}>
+                          Add to Cart
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Box>
+                </Modal>
+              </Card>
+            ))
+          ) : (
+            <Typography component="div" variant="h5">
+              No Products Found
+            </Typography>
+          )}
+        </Grid2>
+      ) : (
+        <Grid2
+          container
+          spacing={{ xs: 2, md: 3 }}
+          sx={{ justifyContent: "center" }}
+        >
+          {Object.keys(search).length > 0 ? (
+            search.map((product: ListingItem) => (
+              <Card sx={{ width: "30%" }} key={product.id}>
+                <CardActionArea onClick={() => setOpenProduct(product.id)}>
+                  <CardMedia
+                    component="img"
+                    sx={{
+                      width: "100%",
+                      maxHeight: "10em",
+                      overflow: "hidden",
+                    }}
+                    image={product.imageURL}
+                    title={product.title}
+                  ></CardMedia>
+                  <CardContent>
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="div"
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <div>{product.title}</div>
+                      <div style={{ color: "gold" }}>${product.price}</div>
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      {product.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+                <Modal
+                  open={openProduct === product.id}
+                  onClose={() => setOpenProduct(null)}
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "60%",
+                      bgcolor: "background.paper",
+                      border: "2px solid #000",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <Card key={product.id}>
+                      <CardMedia
+                        component="img"
+                        sx={{
+                          width: "100%",
+                          maxHeight: "70vh",
+                          overflow: "hidden",
+                        }}
+                        image={product.imageURL}
+                        title={product.title}
+                      ></CardMedia>
+                      <CardContent>
+                        <Typography
+                          gutterBottom
+                          variant="h5"
+                          component="div"
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <div>{product.title}</div>
+                          <div style={{ color: "gold" }}>${product.price}</div>
+                        </Typography>
+
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "text.secondary" }}
+                        >
+                          {product.description}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button onClick={() => addCartItem(product)}>
+                          Add to Cart
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Box>
+                </Modal>
+              </Card>
+            ))
+          ) : (
+            <Typography component="div" variant="h5">
+              No Search Results Found
+            </Typography>
+          )}
+        </Grid2>
+      )}
     </>
   );
 }

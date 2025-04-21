@@ -4,21 +4,37 @@ import {
   Card,
   CardContent,
   CardMedia,
-  FormControl,
   Grid2,
-  Input,
-  InputLabel,
   Modal,
   Typography,
 } from "@mui/material";
-import { ListingItem } from "../../utility/interfaces";
+import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
+// import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
-export default function Cart() {
+const API_URL = "http://localhost:8000";
+
+export default function Cart({
+  curUser,
+}: {
+  curUser: {
+    email: string;
+    password: string;
+    datetime_created: string;
+    funds: number;
+    is_admin: boolean;
+  } | null;
+}) {
   const cartData = JSON.parse(localStorage.getItem("cart") as string);
   const [totalPrice, setTotalPrice] = useState(0);
   const [purchaseModal, setPurchaseModal] = useState(false);
+
+  // const payPalOptions = {
+  //   clientId: "test",
+  //   currency: "USD",
+  //   intent: "capture",
+  // };
 
   useEffect(() => {
     let price = 0;
@@ -30,9 +46,32 @@ export default function Cart() {
     setTotalPrice(price);
   }, [cartData]);
 
-  const handlePurchase = () => {
-    //Placeholder operation
-    console.log("Purchased items: " + cartData + " for " + totalPrice);
+  const handlePurchase = async () => {
+    console.log(cartData);
+
+    //Add new order(s, since we need to store each item ordered)
+    await Promise.all(
+      cartData.map(async (element: ListingItem) => {
+        const newOrd: OrderRecord = {
+          order_id: null,
+          purchaser_email: curUser ? curUser.email : "guest",
+          product_id: element["id"] as number,
+        };
+
+        console.log(newOrd);
+
+        await fetch(`${API_URL}/orders`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newOrd),
+        })
+          .then((response) => response.json())
+          .then((response) => console.log(response))
+          .catch((error) => console.error(error));
+      })
+    );
     localStorage.removeItem("cart");
     setPurchaseModal(false);
   };
@@ -93,15 +132,15 @@ export default function Cart() {
                     maxHeight: "10em",
                     overflow: "hidden",
                   }}
-                  image={"/src/assets/" + item.imageURL}
-                  title={item.name}
+                  image={item.imageURL}
+                  title={item.title}
                 ></CardMedia>
                 <CardContent sx={{ display: "flex", flexDirection: "column" }}>
                   <Typography gutterBottom variant="h5" component="div">
                     <div style={{ display: "flex" }}>
-                      {item.name}
+                      {item.title}
                       <Button
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => handleRemove(item.id as number)}
                         sx={{ alignSelf: "flex-start" }}
                       >
                         <DeleteOutline />
@@ -178,14 +217,14 @@ export default function Cart() {
                       maxHeight: "10em",
                       overflow: "hidden",
                     }}
-                    image={"/src/assets/" + item.imageURL}
-                    title={item.name}
+                    image={item.imageURL}
+                    title={item.title}
                   ></CardMedia>
                   <CardContent
                     sx={{ display: "flex", flexDirection: "column" }}
                   >
                     <Typography gutterBottom variant="h5" component="div">
-                      <div style={{ display: "flex" }}>{item.name}</div>
+                      <div>{item.title}</div>
                       <div style={{ color: "gold" }}>${item.price}</div>
                     </Typography>
                   </CardContent>
@@ -196,28 +235,22 @@ export default function Cart() {
                 No Items in Cart
               </Typography>
             )}
+            <Typography>Total: ${totalPrice}</Typography>
+            <br />
           </Grid2>
-          <div>
-            {/* Form input div */}
-            <FormControl sx={{ width: "100%", marginBottom: "5%" }}>
-              <InputLabel htmlFor="purchaseInput">
-                Purchase Input Placeholder
-              </InputLabel>
-              <Input
-                id="purchaseInput"
-                name="purchase"
-                placeholder="Placeholder input"
-                // onChange={handleInput}
-              />
-            </FormControl>
-          </div>
+          {/* <PayPalScriptProvider options={payPalOptions}> */}
           <Button
-            disabled={!(cartData && Object.keys(cartData).length)}
+            disabled={
+              !(cartData && Object.keys(cartData).length && curUser !== null)
+            }
             variant="contained"
             onClick={handlePurchase}
+            sx={{ marginBottom: "1em" }}
           >
             Confirm Purchase
           </Button>
+          {/* <PayPalButtons />
+          </PayPalScriptProvider> */}
         </Box>
       </Modal>
     </>
