@@ -11,7 +11,7 @@ import {
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
-import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+// import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 const API_URL = "http://localhost:8000";
 
@@ -30,11 +30,11 @@ export default function Cart({
   const [totalPrice, setTotalPrice] = useState(0);
   const [purchaseModal, setPurchaseModal] = useState(false);
 
-  const payPalOptions = {
-    clientId: "test",
-    currency: "USD",
-    intent: "capture",
-  };
+  // const payPalOptions = {
+  //   clientId: "test",
+  //   currency: "USD",
+  //   intent: "capture",
+  // };
 
   useEffect(() => {
     let price = 0;
