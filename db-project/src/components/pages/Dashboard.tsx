@@ -3,18 +3,20 @@ import {
   FormControl,
   Input,
   InputLabel,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { CloudUpload } from "@mui/icons-material";
-import { API_WITH_PORT } from "../../utility/environment";
+import { API_WITH_PORT, filterCats } from "../../utility/environment";
 
 const API_URL = "http://127.0.0.1:8000";
 
@@ -62,8 +64,6 @@ export default function Dashboard() {
         }
       });
       if (!alreadyExists) {
-        console.log(JSON.stringify(product));
-        // prevProd.push(product);
         await fetch(`${API_URL}/products`, {
           method: "POST",
           body: JSON.stringify(product),
@@ -188,6 +188,7 @@ export default function Dashboard() {
               name="title"
               placeholder="Title"
               onChange={handleInput}
+              sx={{ marginBottom: "1em" }}
             />
           </FormControl>
           <FormControl>
@@ -197,6 +198,7 @@ export default function Dashboard() {
               name="price"
               placeholder="Price"
               onChange={handleInput}
+              sx={{ marginBottom: "1em" }}
             />
           </FormControl>
           <FormControl>
@@ -206,6 +208,7 @@ export default function Dashboard() {
               name="in_stock"
               placeholder="Number in Stock"
               onChange={handleInput}
+              sx={{ marginBottom: "1em" }}
             />
           </FormControl>
           <FormControl>
@@ -215,7 +218,26 @@ export default function Dashboard() {
               name="description"
               placeholder="Description"
               onChange={handleInput}
+              sx={{ marginBottom: "1em" }}
             />
+          </FormControl>
+          <FormControl>
+            <TextField
+              id="select-category"
+              select
+              label="Category"
+              name="category"
+              defaultValue="all"
+              helperText="Please select a filter category"
+              sx={{ marginBottom: "1em" }}
+              onChange={handleInput}
+            >
+              {filterCats.map((option) => (
+                <MenuItem key={option.base_str} value={option.base_str}>
+                  {option.value}
+                </MenuItem>
+              ))}
+            </TextField>
           </FormControl>
           <FormControl>
             <Button
@@ -223,6 +245,7 @@ export default function Dashboard() {
               role={undefined}
               tabIndex={-1}
               startIcon={<CloudUpload />}
+              sx={{ marginBottom: "1em" }}
             >
               Upload files
               <VisuallyHiddenInput

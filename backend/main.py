@@ -46,9 +46,9 @@ def add_user(email, password, funds=0, is_admin=False):
 def add_product(product):
 
     cursor.execute("""
-        INSERT INTO products (title, description, price, in_stock, imageURL)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (product.title, product.description, product.price, product.in_stock, product.imageURL))
+        INSERT INTO products (title, description, price, in_stock, imageURL, category)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (product.title, product.description, product.price, product.in_stock, product.imageURL, product.category))
     db.commit()
 
 def place_order(email, product_id):
@@ -86,6 +86,7 @@ class Product(BaseModel):
     in_stock: int
     id: int | None
     imageURL: str | None
+    category: str | None
 
 class Order(BaseModel):
     order_id: int | None = None

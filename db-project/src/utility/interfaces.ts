@@ -5,6 +5,7 @@ export interface ListingItem {
   description: string; //String description of item
   id: number | null; //Unique ID for item
   in_stock: number; //Number of item in stock
+  category: string; //Category of the item for filtering
 }
 
 export interface OrderRecord {
