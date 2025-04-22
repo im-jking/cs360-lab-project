@@ -9,10 +9,10 @@ export default function Home() {
 
   const populateData = async () => {
     const prods: ListingItem[] = await fetch(`${API_WITH_PORT}/products`, {
-      // headers: {
-      //   "Content-Type": "application/json",
-      //   Accept: "application/json",
-      // },
+      headers: {
+        //   "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     })
       .then((response) => response.json())
       .catch((error) => console.error(`Error retrieving products: ${error}`));
