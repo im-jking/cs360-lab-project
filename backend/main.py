@@ -10,10 +10,16 @@ import shutil
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",
-    "https://localhost:5173",
-    "http://127.0.0.1:5173", 
-    "https://127.0.0.1:5173"
+    # "http://localhost:5173",
+    # "https://localhost:5173",
+    # "http://127.0.0.1:5173", 
+    # "https://127.0.0.1:5173"
+    "http://localhost:80",
+    "https://localhost:80",
+    "http://127.0.0.1:80", 
+    "https://127.0.0.1:80"
+    "http://cs360-lab-project:80"
+    "https://cs360-lab-project:80"
 ]
 
 app.add_middleware(
@@ -26,12 +32,12 @@ app.add_middleware(
 
 # Connect to MySQL
 db = mysql.connector.connect(
-    host="localhost",
-    user="labuser",
-    password="CS360_Project",
+    host="mysql.railway.internal",
+    user="root",
+    password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
     # user="root",
     # password="360classproj",
-    database="shopdb"
+    database="railway"
 )
 
 cursor = db.cursor(dictionary=True)
