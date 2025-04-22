@@ -13,7 +13,6 @@ export default function Home() {
         //   "Content-Type": "application/json",
         Accept: "application/json",
       },
-      mode: "no-cors",
     })
       .then((response) => response.json())
       .catch((error) => console.error(`Error retrieving products: ${error}`));
