@@ -1,5 +1,6 @@
 // export const API_WITH_PORT = "http://localhost:8000";
-export const API_WITH_PORT = "https://backend.railway.internal:8000";
+export const API_WITH_PORT =
+  "https://backend-production-69a2.up.railway.app:8000";
 
 export const filterCats = [
   {
