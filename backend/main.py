@@ -22,6 +22,7 @@ origins = [
     "https://cs360-lab-project:80"
     "http://cs360-lab-project-production.up.railway.app:*"
     "https://cs360-lab-project-production.up.railway.app:*"
+    "https://cs360-lab-project-production.up.railway.app"
 ]
 
 app.add_middleware(
