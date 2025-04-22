@@ -11,9 +11,8 @@ import {
 import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { useEffect, useState } from "react";
 import { DeleteOutline } from "@mui/icons-material";
+import { API_WITH_PORT } from "../../utility/environment";
 // import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
-
-const API_URL = "http://localhost:8000";
 
 export default function Cart({
   curUser,
@@ -60,7 +59,7 @@ export default function Cart({
 
         console.log(newOrd);
 
-        await fetch(`${API_URL}/orders`, {
+        await fetch(`${API_WITH_PORT}/orders`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
