@@ -19,11 +19,11 @@ origins = [
     # "http://127.0.0.1:80", 
     # "https://127.0.0.1:80"
     # "http://cs360-lab-project:80"
-    # "https://cs360-lab-project:80"
-    # "http://cs360-lab-project-production.up.railway.app:*"
-    # "https://cs360-lab-project-production.up.railway.app:*"
-    # "https://cs360-lab-project-production.up.railway.app"
-    "*"
+    "https://cs360-lab-project:80"
+    "http://cs360-lab-project-production.up.railway.app"
+    "https://cs360-lab-project-production.up.railway.app"
+    "http://cs360-lab-project-production.up.railway.app:*"
+    "https://cs360-lab-project-production.up.railway.app:*"
 ]
 
 app.add_middleware(
