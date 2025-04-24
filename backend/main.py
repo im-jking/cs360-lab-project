@@ -107,6 +107,16 @@ class Order(BaseModel):
     product_id: int
 
 # FastAPI routes
+@app.options("/users")
+def handle_user_options(request: Request):
+    # response = Response()
+    # response.headers["Access-Control-Allow-Origin"] = "*"
+    # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    # response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    # response.status_code = 200
+    # return response
+    return {"message": "Options handled"}
+
 @app.post("/users")
 def create_user(user: User):
     try:
@@ -120,7 +130,7 @@ def get_users():
     return list_users()
 
 @app.options("/products")
-def handle_options(request: Request):
+def handle_prod_options(request: Request):
     # response = Response()
     # response.headers["Access-Control-Allow-Origin"] = "*"
     # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
@@ -140,6 +150,16 @@ def create_product(product: Product):
 @app.get("/products")
 def get_products():
     return list_products()
+
+@app.options("/orders")
+def handle_ord_options(request: Request):
+    # response = Response()
+    # response.headers["Access-Control-Allow-Origin"] = "*"
+    # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    # response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    # response.status_code = 200
+    # return response
+    return {"message": "Options handled"}
 
 @app.post("/orders")
 def create_order(order: Order):
