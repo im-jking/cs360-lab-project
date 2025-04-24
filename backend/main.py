@@ -19,7 +19,7 @@ origins = [
     # "http://127.0.0.1:80", 
     # "https://127.0.0.1:80"
     # "http://cs360-lab-project:80"
-    "https://cs360-lab-project:80"
+    # "https://cs360-lab-project:80"
     "http://cs360-lab-project-production.up.railway.app"
     "https://cs360-lab-project-production.up.railway.app"
     "http://cs360-lab-project-production.up.railway.app:*"
@@ -115,6 +115,16 @@ def create_user(user: User):
 @app.get("/users")
 def get_users():
     return list_users()
+
+@app.options("/products")
+def handle_options(request: Request):
+    # response = Response()
+    # response.headers["Access-Control-Allow-Origin"] = "*"
+    # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    # response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    # response.status_code = 200
+    # return response
+    return {"message": "Options handled"}
 
 @app.post("/products")
 def create_product(product: Product):
