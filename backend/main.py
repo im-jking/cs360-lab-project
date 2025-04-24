@@ -50,41 +50,103 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 def add_user(email, password, funds=0, is_admin=False):
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+
     cursor.execute("""
         INSERT INTO users (email, password, funds, is_admin)
         VALUES (%s, %s, %s, %s)
     """, (email, password, funds, is_admin))
     db.commit()
+    db.close()
 
 def add_product(product):
-
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+    
     cursor.execute("""
         INSERT INTO products (title, description, price, in_stock, imageURL, category)
         VALUES (%s, %s, %s, %s, %s, %s)
     """, (product.title, product.description, product.price, product.in_stock, product.imageURL, product.category))
     db.commit()
+    db.close()
 
 def place_order(email, product_id):
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+    
     cursor.execute("""
         INSERT INTO orders (purchaser_email, product_id)
         VALUES (%s, %s)
     """, (email, product_id))
     db.commit()
+    db.close()
 
 def list_users():
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+    
     cursor.execute("SELECT * FROM users")
-    return cursor.fetchall()
+    data = cursor.fetchall()
+    db.close()
+    return data
 
 def list_products():
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+    
     cursor.execute("SELECT * FROM products")
-    return cursor.fetchall()
+    data = cursor.fetchall()
+    db.close()
+    return data
 
 def list_orders(user_email: str | None = None):
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+    
     if user_email is None:
         cursor.execute("SELECT * FROM orders")
     else:
         cursor.execute(f"SELECT * FROM orders WHERE orders.purchaser_email=\"{user_email}\"")
-    return cursor.fetchall()
+    data = cursor.fetchall()
+    db.close()
+    return data
 
 class User(BaseModel):
     email: str
@@ -109,12 +171,6 @@ class Order(BaseModel):
 # FastAPI routes
 @app.options("/users")
 def handle_user_options(request: Request):
-    # response = Response()
-    # response.headers["Access-Control-Allow-Origin"] = "*"
-    # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    # response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    # response.status_code = 200
-    # return response
     return {"message": "Options handled"}
 
 @app.post("/users")
@@ -131,12 +187,6 @@ def get_users():
 
 @app.options("/products")
 def handle_prod_options(request: Request):
-    # response = Response()
-    # response.headers["Access-Control-Allow-Origin"] = "*"
-    # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    # response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    # response.status_code = 200
-    # return response
     return {"message": "Options handled"}
 
 @app.post("/products")
@@ -153,12 +203,6 @@ def get_products():
 
 @app.options("/orders")
 def handle_ord_options(request: Request):
-    # response = Response()
-    # response.headers["Access-Control-Allow-Origin"] = "*"
-    # response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    # response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    # response.status_code = 200
-    # return response
     return {"message": "Options handled"}
 
 @app.post("/orders")
@@ -179,6 +223,15 @@ def get_orders_user(user_email: str):
 
 @app.post("/one_user")
 def login(user: User):
+    # Connect to MySQL
+    db = mysql.connector.connect(
+        host="mysql.railway.internal",
+        user="root",
+        password="wNHVevLzAKAKXOVbxHFHDhgrDfIXVwTA",
+        database="railway"
+    )
+    cursor = db.cursor(dictionary=True)
+    
     cursor.execute("SELECT * FROM users WHERE users.email=%s AND users.password=%s", (user.email, user.password))
     result = cursor.fetchall()
     if len(result) == 1:
