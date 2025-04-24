@@ -26,7 +26,7 @@ export default function Products() {
     const prods: ListingItem[] = await fetch(`${API_WITH_PORT}/products`, {
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
+        "Accept": "application/json", //prettier-ignore
       },
     })
       .then((response) => response.json())
