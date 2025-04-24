@@ -9,7 +9,7 @@ import shutil
 
 app = FastAPI()
 
-origins = [
+#origins = [
     # "http://localhost:5173",
     # "https://localhost:5173",
     # "http://127.0.0.1:5173", 
@@ -20,10 +20,13 @@ origins = [
     # "https://127.0.0.1:80"
     # "http://cs360-lab-project:80"
     # "https://cs360-lab-project:80"
-    "http://cs360-lab-project-production.up.railway.app"
-    "https://cs360-lab-project-production.up.railway.app"
-    "http://cs360-lab-project-production.up.railway.app:*"
-    "https://cs360-lab-project-production.up.railway.app:*"
+    # "http://cs360-lab-project-production.up.railway.app:*"
+    # "https://cs360-lab-project-production.up.railway.app:*"
+#]
+
+origins = [
+    "https://cs360-lab-project-production.up.railway.app",
+    "http://cs360-lab-project-production.up.railway.app",
 ]
 
 app.add_middleware(
