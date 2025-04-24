@@ -18,15 +18,13 @@ import { ListingItem, OrderRecord } from "../../utility/interfaces";
 import { CloudUpload } from "@mui/icons-material";
 import { API_WITH_PORT, filterCats } from "../../utility/environment";
 
-const API_URL = "http://127.0.0.1:8000";
-
 export default function Dashboard() {
   const [prodFormData, setProdFormData] = useState<ListingItem | null>(null);
   const [products, setProducts] = useState<ListingItem[]>([]);
   const [orderData, setOrderData] = useState<OrderRecord[]>([]);
 
   const fillInfo = async () => {
-    await fetch(`${API_URL}/products`, {
+    await fetch(`${API_WITH_PORT}/products`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -36,7 +34,7 @@ export default function Dashboard() {
       .then((response) => setProducts(response))
       .catch((error) => console.error(`Error retrieving products: ${error}`));
 
-    await fetch(`${API_URL}/orders`, {
+    await fetch(`${API_WITH_PORT}/orders`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -64,7 +62,7 @@ export default function Dashboard() {
         }
       });
       if (!alreadyExists) {
-        await fetch(`${API_URL}/products`, {
+        await fetch(`${API_WITH_PORT}/products`, {
           method: "POST",
           body: JSON.stringify(product),
           headers: {
